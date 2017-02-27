@@ -5,17 +5,21 @@ var GraphQLString = graphql.GraphQLString;
 var GraphQLList = graphql.GraphQLList;
 var GraphQLInt = graphql.GraphQLInt;
 var { productType } = require('./inputtype')
-var products = require('../../data');
+var productServices = require('./services')
 var getHey = {
   type: GraphQLString,
   resolve: function(_, args){
-    return products[0].name
+    return "Hello GraphQL"
   }
 }
 var getProducts = {
   type: new GraphQLList(productType),
   resolve: function(_, args){
-    return products
+    return new Promise(function(resolve, reject) {
+      productServices.getProducts(function(data){
+        resolve(data)
+      })
+    })
   }
 }
 var getProductByPrice = {
@@ -26,10 +30,12 @@ var getProductByPrice = {
     }
   },
   resolve: function(_, args){
-    var filterProduct = products.filter(function(product){
-      return product.price <= args.price
+    var priceParams = args.price
+    return new Promise(function(resolve, reject) {
+      productServices.getProductByPrice(priceParams, function(data){
+        resolve(data)
+      })
     })
-    return filterProduct
   }
 }
 module.exports = {

@@ -5,9 +5,9 @@ var GraphQLString = graphql.GraphQLString;
 var GraphQLList = graphql.GraphQLList;
 var GraphQLInt = graphql.GraphQLInt;
 var { productType } = require('./inputtype')
-var products = require('../../data');
+var productServices = require('./services')
 var addProduct = {
-  type: new GraphQLList(productType),
+  type: productType,
   args: {
     name: {
      type: GraphQLString
@@ -20,25 +20,27 @@ var addProduct = {
    }
   },
   resolve: function(_, args){
-    var product = {
-      name: args.name,
-      price: args.price,
-      category: args.category
-    }
-    products.push(product)
-    return products
+    return new Promise(function(resolve, reject) {
+      productServices.createProduct(args, function(data){
+        console.log(data);
+        resolve(data)
+      })
+    })
   }
 }
 var deleteProduct = {
-  type: new GraphQLList(productType),
+  type: productType,
   args: {
-    name: {
+    id: {
      type: GraphQLString
    }
   },
   resolve: function(_, args){
-    return products.filter(function(product){
-      return product.name != args.name // bad
+    return new Promise(function(resolve, reject) {
+      productServices.deleteProduct(args.id, function(data){
+        console.log(data);
+        resolve(data)
+      })
     })
   }
 }
